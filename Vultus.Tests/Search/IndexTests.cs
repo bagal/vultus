@@ -163,7 +163,7 @@ namespace Vultus.Tests
         }
 
         [Fact]
-        public void Indexer_Should_Return_Null_When_Empty_Lookups()
+        public void Indexer_Should_Return_Empty_HashSet_When_Empty_Lookups()
         {
             var index = new Index<string, TestObject>(x => x.Code);
             var indexer = index.AddIndex("test", x => x.Ccy);
@@ -175,11 +175,12 @@ namespace Vultus.Tests
 
             var result = indexer.Filter(new List<object>());
 
-            Assert.Null(result);
+            Assert.NotNull(result);
+            Assert.Empty(result);
         }
 
         [Fact]
-        public void Indexer_Should_Return_Null_When_Filter_Does_Not_Match()
+        public void Indexer_Should_Return_Empty_HashSet_When_Filter_Does_Not_Match()
         {
             var index = new Index<string, TestObject>(x => x.Code);
             var indexer = index.AddIndex("test", x => x.Ccy);
@@ -191,7 +192,8 @@ namespace Vultus.Tests
 
             var result = indexer.Filter("EUR");
 
-            Assert.Null(result);
+            Assert.NotNull(result);
+            Assert.Empty(result);
         }
 
         [Fact]

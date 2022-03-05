@@ -13,6 +13,7 @@ namespace Vultus.Search.Indexers
     /// <typeparam name="TItem">Item to index</typeparam>
     public class FieldIndexer<TProperty, TKey, TItem> : IIndexer<TProperty, TKey, TItem>
     {
+        internal static readonly HashSet<TKey> EmptyHashSet = new HashSet<TKey>();
         internal readonly SemaphoreSlim _semaphore;
         internal readonly Func<TItem, TKey> _getKey;
         internal readonly Func<TItem, TProperty> _getProperty;
@@ -28,7 +29,7 @@ namespace Vultus.Search.Indexers
 
         public void Update(IEnumerable<TItem> values)
         {
-            if (!values.Any())
+            if (values == null || !values.Any())
                 return;
 
             _semaphore.Wait();
@@ -76,7 +77,7 @@ namespace Vultus.Search.Indexers
                 return _index[lookup];
             }
 
-            return null;
+            return EmptyHashSet;
         }
 
         public HashSet<TKey>? Filter(IEnumerable<TProperty> lookups)
@@ -92,7 +93,7 @@ namespace Vultus.Search.Indexers
         public HashSet<TKey>? Filter(IEnumerable<object> lookups)
         {
             if (!lookups.Any())
-                return null;
+                return EmptyHashSet;
 
             return Filter(lookups.Cast<TProperty>());
         }

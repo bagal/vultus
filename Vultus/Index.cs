@@ -1,6 +1,7 @@
 ﻿using Vultus.Search.Indexers;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace Vultus.Search
         private readonly SemaphoreSlim _semaphore;
         internal readonly Func<TItem, TKey> _getKey;
         internal Dictionary<TKey, TItem> _index;
+        internal ImmutableHashSet<TKey> _keys;
+        internal ImmutableList<TItem> _items;
         internal Dictionary<string, IIndexer<TKey, TItem>> _indexes;
 
         public Index(Func<TItem, TKey> getKey) 
@@ -19,8 +22,12 @@ namespace Vultus.Search
             _semaphore = new SemaphoreSlim(1, 1);
             _getKey = getKey;
             _index = new Dictionary<TKey, TItem>();
+            _keys = ImmutableHashSet.Create<TKey>();
+            _items = ImmutableList<TItem>.Empty;
             _indexes = new Dictionary<string, IIndexer<TKey, TItem>>();
         }
+
+        public long Count => _items.Count;
 
         public void Update(IEnumerable<TItem> items)
         {
@@ -46,9 +53,10 @@ namespace Vultus.Search
                 }
 
                 Interlocked.Exchange(ref _index, updatedCache);
+                Interlocked.Exchange(ref _keys, _index.Keys.ToImmutableHashSet());
+                Interlocked.Exchange(ref _items, _index.Values.ToImmutableList());
 
-                var indexItems = Items().ToList();
-                Parallel.ForEach(_indexes, (x) => x.Value.Update(indexItems));
+                Parallel.ForEach(_indexes, (x) => x.Value.Update(_items));
             }
             finally
             {
@@ -56,9 +64,11 @@ namespace Vultus.Search
             }
         }
 
+        public ImmutableHashSet<TKey> Keys => _keys;
+
         public IEnumerable<TItem> Items()
         {
-            return _index.Values;
+            return _items;
         }
 
         public TItem Filter(TKey lookup)
@@ -68,7 +78,7 @@ namespace Vultus.Search
                 return _index[lookup];
             }
 
-            return null;
+            return default!;
         }
 
         public IEnumerable<TItem> Filter(IEnumerable<TKey>? lookups)
