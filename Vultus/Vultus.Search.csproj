@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <Authors>Paul Cole</Authors>
     <Description>Simple, lightweight, In-memory search index</Description>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
@@ -15,10 +15,14 @@
     <RepositoryUrl>https://github.com/bagal/vultus</RepositoryUrl>
   </PropertyGroup>
 
-	<ItemGroup>
-	  <None Include="..\README.md">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 </Project>
