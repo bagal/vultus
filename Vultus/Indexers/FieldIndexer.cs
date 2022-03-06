@@ -47,7 +47,7 @@ namespace Vultus.Search.Indexers
                     {
                         if (updatedIndex.ContainsKey(property))
                         {
-                            updatedIndex[property].Add(key);
+                            updatedIndex[property]!.Add(key);
                         }
                         else
                         {
@@ -72,6 +72,9 @@ namespace Vultus.Search.Indexers
 
         public HashSet<TKey>? Filter(TProperty lookup)
         {
+            if (lookup == null)
+                return EmptyHashSet;
+
             if (_index.ContainsKey(lookup))
             {
                 return _index[lookup];
@@ -85,14 +88,17 @@ namespace Vultus.Search.Indexers
             return lookups.Where(x => _index.ContainsKey(x)).SelectMany(x => _index[x]).ToHashSet<TKey>();
         }
 
-        public HashSet<TKey>? Filter(object lookup)
+        public HashSet<TKey>? Filter(object? lookup)
         {
+            if (lookup == null)
+                return EmptyHashSet;
+
             return Filter((TProperty)lookup);
         }
 
-        public HashSet<TKey>? Filter(IEnumerable<object> lookups)
+        public HashSet<TKey>? Filter(IEnumerable<object>? lookups)
         {
-            if (!lookups.Any())
+            if (lookups == null || !lookups.Any())
                 return EmptyHashSet;
 
             return Filter(lookups.Cast<TProperty>());

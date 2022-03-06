@@ -6,8 +6,8 @@ namespace Vultus.Search.Indexers
     {
         void Update(IEnumerable<TItem> values);
         HashSet<TKey> Items();
-        HashSet<TKey>? Filter(object lookup);
-        HashSet<TKey>? Filter(IEnumerable<object> lookups);
+        HashSet<TKey>? Filter(object? lookup);
+        HashSet<TKey>? Filter(IEnumerable<object>? lookups);
     }
 
     public interface IIndexer<in TProperty, TKey, in TItem> : IIndexer<TKey, TItem>

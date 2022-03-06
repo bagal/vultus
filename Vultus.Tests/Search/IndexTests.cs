@@ -34,7 +34,7 @@ namespace Vultus.Tests
 
             index.Update(MockData.GenerateTestObjects(20));
 
-            Assert.Equal(20, index.Items().Count());
+            Assert.Equal(20, index.Count);
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace Vultus.Tests
 
             index.Update(new List<TestObject>());
 
-            Assert.Equal(0, index.Items().Count());
+            Assert.Equal(0, index.Count);
         }
 
         [Fact]
@@ -106,6 +106,14 @@ namespace Vultus.Tests
             var indexer = index.AddIndex("test", x => x.Ccy);
 
             Assert.Throws<ArgumentException>(() => index.AddIndex("test", x => x.Ccy));
+        }
+
+        [Fact]
+        public void Should_Throw_When_Indexer_Name_Is_Null()
+        {
+            var index = new Index<string, TestObject>(x => x.Code);
+            
+            Assert.Throws<ArgumentNullException>(() => index.AddIndex(null, x => x.Ccy));
         }
 
         [Fact]
@@ -448,6 +456,18 @@ namespace Vultus.Tests
             Assert.True(highLookup.All(x => x.High == true));
             Assert.True(lowLookup.All(x => x.Low == true));
             Assert.True(lookup.All(x => x.Ccy == "GBP" && x.High == true && x.Low == true));
+        }
+
+        [Fact]
+        public void Indexer_Should_Return_Empty_HashSet_When_Lookup_Is_Null()
+        {
+            var index = new Index<string, TestObject>(x => x.Code);
+            var indexer = index.AddIndex("test", x => x.Ccy);
+
+            var result = indexer.Filter(null);
+
+            Assert.NotNull(result);
+            Assert.Empty(result);
         }
     }
 }

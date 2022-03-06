@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <Nullable>enable</Nullable>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
     <Authors>Paul Cole</Authors>
     <Description>Simple, lightweight, In-memory search index</Description>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
@@ -14,10 +14,6 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/bagal/vultus</RepositoryUrl>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Update="README.md">
