@@ -70,6 +70,12 @@ namespace Vultus.Search.Indexers
             return _index.Values.SelectMany(x => x).ToHashSet();
         }
 
+        public bool ContainsKey(TProperty lookup) => _index.ContainsKey(lookup);
+        public bool ContainsKey(object lookup) => _index.ContainsKey((TProperty)lookup);
+
+        public HashSet<TKey>? this[TProperty lookup] => _index[lookup];
+        public HashSet<TKey>? this[object lookup] => _index[(TProperty)lookup];
+
         public HashSet<TKey>? Filter(TProperty lookup)
         {
             if (lookup == null)

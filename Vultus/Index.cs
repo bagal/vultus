@@ -54,6 +54,10 @@ namespace Vultus.Search
             }
         }
 
+        public bool ContainsKey(TKey lookup) => _index.ContainsKey(lookup);
+
+        public TItem this[TKey lookup] => _index[lookup];
+
         public TItem Filter(TKey lookup)
         {
             if (_index.ContainsKey(lookup))

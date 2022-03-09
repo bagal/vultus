@@ -8,6 +8,8 @@ namespace Vultus.Search
         IEnumerable<TKey> Keys { get; }
         IEnumerable<TItem> Items { get; }
         void Update(IEnumerable<TItem> items);
+        bool ContainsKey(TKey lookup);
+        TItem this[TKey lookup] { get; }
         TItem Filter(TKey lookup);
         IEnumerable<TItem> Filter(IEnumerable<TKey>? lookups);
     }

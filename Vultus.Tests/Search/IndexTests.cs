@@ -47,6 +47,22 @@ namespace Vultus.Tests
             Assert.Equal(0, index.Count);
         }
 
+        [Theory]
+        [InlineData("Test1", true)]
+        [InlineData("Test2", false)]
+        public void Index_ContainsKey(string key, bool expectedResult)
+        {
+            var index = new Index<string, TestObject>(x => x.Code);
+
+            var test1 = new TestObject { Code = "Test1", Ccy = "GBP", Balance = 1000, High = true, Low = true };
+
+            index.Update(new List<TestObject> { test1 });
+
+            var result = index.ContainsKey(key);
+
+            Assert.Equal(expectedResult, result);
+        }
+
         [Fact]
         public void Should_Filter_Items_By_Key()
         {
@@ -55,6 +71,19 @@ namespace Vultus.Tests
             index.Update(MockData.GenerateTestObjects(20));
 
             var result = index.Filter("Test10");
+
+            Assert.NotNull(result);
+            Assert.Equal("Test10", result.Code);
+        }
+
+        [Fact]
+        public void Should_Lookup_Items_By_Key()
+        {
+            var index = new Index<string, TestObject>(x => x.Code);
+
+            index.Update(MockData.GenerateTestObjects(20));
+
+            var result = index["Test10"];
 
             Assert.NotNull(result);
             Assert.Equal("Test10", result.Code);
@@ -149,6 +178,40 @@ namespace Vultus.Tests
 
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
+        }
+
+        [Fact]
+        public void Indexer_Should_Lookup_By_Property()
+        {
+            var index = new Index<string, TestObject>(x => x.Code);
+            var indexer = index.AddIndex("test", x => x.Ccy);
+
+            var test1 = new TestObject { Code = "Test1", Ccy = "GBP", Balance = 1000, High = true, Low = true };
+            var test2 = new TestObject { Code = "Test2", Ccy = "GBP", Balance = 1000, High = false, Low = true };
+
+            index.Update(new List<TestObject> { test1, test2 });
+
+            var result = indexer["GBP"];
+
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count());
+        }
+
+        [Theory]
+        [InlineData("GBP", true)]
+        [InlineData("EUR", false)]
+        public void Indexer_ContainsKey(string key, bool expectedResult)
+        {
+            var index = new Index<string, TestObject>(x => x.Code);
+            var indexer = index.AddIndex("test", x => x.Ccy);
+
+            var test1 = new TestObject { Code = "Test1", Ccy = "GBP", Balance = 1000, High = true, Low = true };
+
+            index.Update(new List<TestObject> { test1 });
+
+            var result = indexer.ContainsKey(key);
+
+            Assert.Equal(expectedResult, result);
         }
 
         [Fact]
