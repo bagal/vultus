@@ -28,7 +28,7 @@ namespace Vultus.Search
 
         public IEnumerable<TItem> Items => _index.Values;
 
-        public void Update(IEnumerable<TItem> items)
+        public void Update(IEnumerable<TItem> items, IEnumerable<TKey>? toRemove = null)
         {
             if (items == null || !items.Any())
                 return;
@@ -42,6 +42,17 @@ namespace Vultus.Search
                 {
                     var key = _getKey(item);
                     updatedCache[key] = item;
+                }
+
+                if (toRemove != null)
+                {
+                    foreach (var item in toRemove)
+                    {
+                        if (updatedCache.ContainsKey(item))
+                        {
+                            updatedCache.Remove(item);
+                        }
+                    }
                 }
 
                 Interlocked.Exchange(ref _index, updatedCache);

@@ -532,5 +532,15 @@ namespace Vultus.Tests
             Assert.NotNull(result);
             Assert.Empty(result);
         }
+
+        [Fact]
+        public void Should_Remove_Items_From_Index()
+        {
+            var index = new Index<string, TestObject>(x => x.Code);
+
+            index.Update(MockData.GenerateTestObjects(20), new List<string> { "Test0", "Test1", "Test2" });
+
+            Assert.Equal(17, index.Count);
+        }
     }
 }

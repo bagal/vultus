@@ -7,7 +7,7 @@ namespace Vultus.Search
         long Count { get; }
         IEnumerable<TKey> Keys { get; }
         IEnumerable<TItem> Items { get; }
-        void Update(IEnumerable<TItem> items);
+        void Update(IEnumerable<TItem> items, IEnumerable<TKey>? toRemove = null);
         bool ContainsKey(TKey lookup);
         TItem this[TKey lookup] { get; }
         TItem Filter(TKey lookup);
