@@ -18,6 +18,7 @@ namespace Vultus.Search.Indexers
         internal readonly Func<TItem, TKey> _getKey;
         internal readonly Func<TItem, TProperty> _getProperty;
         internal Dictionary<TProperty, HashSet<TKey>?> _index;
+        internal readonly IEqualityComparer<TProperty>? _comparer = null;
 
         public FieldIndexer(Func<TItem, TKey> getKey, Func<TItem, TProperty> getProperty)
         {
@@ -25,6 +26,15 @@ namespace Vultus.Search.Indexers
             _getKey = getKey;
             _getProperty = getProperty;
             _index = new Dictionary<TProperty, HashSet<TKey>?>();
+        }
+
+        public FieldIndexer(Func<TItem, TKey> getKey, Func<TItem, TProperty> getProperty, IEqualityComparer<TProperty> comparer)
+        {
+            _semaphore = new SemaphoreSlim(1, 1);
+            _getKey = getKey;
+            _getProperty = getProperty;
+            _index = new Dictionary<TProperty, HashSet<TKey>?>(comparer);
+            _comparer = comparer;
         }
 
         public void Update(IEnumerable<TItem> values)
@@ -37,7 +47,7 @@ namespace Vultus.Search.Indexers
             {
                 // Let's assume we're going to index at least 2 different values, so take half the count and set our initial HashSet capacity to that to avoid over allocations
                 int maxSize = values.Count() / 2;
-                var updatedIndex = new Dictionary<TProperty, HashSet<TKey>?>();
+                var updatedIndex = _comparer != null ? new Dictionary<TProperty, HashSet<TKey>?>(_comparer) : new Dictionary<TProperty, HashSet<TKey>?>();
 
                 foreach (var item in values)
                 {

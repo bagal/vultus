@@ -63,6 +63,22 @@ namespace Vultus.Tests
             Assert.Equal(expectedResult, result);
         }
 
+        [Theory]
+        [InlineData("tEsT1", true)]
+        [InlineData("Test2", false)]
+        public void Index_ContainsKey_Comparer(string key, bool expectedResult)
+        {
+            var index = new Index<string, TestObject>(x => x.Code, StringComparer.OrdinalIgnoreCase);
+
+            var test1 = new TestObject { Code = "Test1", Ccy = "GBP", Balance = 1000, High = true, Low = true };
+
+            index.Update(new List<TestObject> { test1 });
+
+            var result = index.ContainsKey(key);
+
+            Assert.Equal(expectedResult, result);
+        }
+
         [Fact]
         public void Should_Filter_Items_By_Key()
         {
@@ -179,6 +195,24 @@ namespace Vultus.Tests
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
         }
+
+        [Fact]
+        public void Indexer_With_Comparer_Should_Filter()
+        {
+            var index = new Index<string, TestObject>(x => x.Code);
+            var indexer = index.AddIndex("test", x => x.Ccy, StringComparer.OrdinalIgnoreCase);
+
+            var test1 = new TestObject { Code = "Test1", Ccy = "GBP", Balance = 1000, High = true, Low = true };
+            var test2 = new TestObject { Code = "Test2", Ccy = "GBP", Balance = 1000, High = false, Low = true };
+
+            index.Update(new List<TestObject> { test1, test2 });
+
+            var result = indexer.Filter("gBp");
+
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count());
+        }
+
 
         [Fact]
         public void Indexer_Should_Lookup_By_Property()

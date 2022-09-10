@@ -13,6 +13,7 @@ namespace Vultus.Search
         internal readonly Func<TItem, TKey> _getKey;
         internal Dictionary<TKey, TItem> _index;
         internal Dictionary<string, IIndexer<TKey, TItem>> _indexes;
+        internal readonly IEqualityComparer<TKey>? _comparer = null;
 
         public Index(Func<TItem, TKey> getKey) 
         {
@@ -20,6 +21,15 @@ namespace Vultus.Search
             _getKey = getKey;
             _index = new Dictionary<TKey, TItem>();
             _indexes = new Dictionary<string, IIndexer<TKey, TItem>>();
+        }
+
+        public Index(Func<TItem, TKey> getKey, IEqualityComparer<TKey> comparer)
+        {
+            _semaphore = new SemaphoreSlim(1, 1);
+            _getKey = getKey;
+            _index = new Dictionary<TKey, TItem>(comparer);
+            _indexes = new Dictionary<string, IIndexer<TKey, TItem>>();
+            _comparer = comparer;
         }
 
         public long Count => _index.Count;
@@ -36,7 +46,7 @@ namespace Vultus.Search
             _semaphore.Wait();
             try
             {
-                var updatedCache = new Dictionary<TKey, TItem>(_index);
+                var updatedCache = _comparer != null ? new Dictionary<TKey, TItem>(_index, _comparer) : new Dictionary<TKey, TItem>(_index);
 
                 foreach (var item in items)
                 {
@@ -109,6 +119,13 @@ namespace Vultus.Search
         public IIndexer<TKey, TItem> AddIndex<TProperty>(string name, Func<TItem, TProperty> extractProperty)
         {
             var index = new FieldIndexer<TProperty, TKey, TItem>(_getKey, extractProperty);
+
+            return AddIndex(name, index);
+        }
+
+        public IIndexer<TKey, TItem> AddIndex<TProperty>(string name, Func<TItem, TProperty> extractProperty, IEqualityComparer<TProperty> comparer)
+        {
+            var index = new FieldIndexer<TProperty, TKey, TItem>(_getKey, extractProperty, comparer);
 
             return AddIndex(name, index);
         }
